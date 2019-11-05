@@ -177,9 +177,9 @@ class Verb(Node):
     def __init__(self, value):
         super().__init__(value)
         self.form = {PRESENT:Node("Present" + value), 
-                        PAST:Node("Present" + value),
-                        PARTICIPLE:Node("Participle"+value),
-                        PROGRESSIVE:Node("Progressive"+value), 
+                        PAST:Node("Past" + value),
+                        PARTICIPLE:Node("Progressive"+value),
+                        PAST + PARTICIPLE:Node("PastParticiple"+value),
                         SINGULAR:Node("PresentSingular"+value)
                     }
     
@@ -192,7 +192,7 @@ class Verb(Node):
                 if key==SINGULAR:
                     new = conjugate(verb=s, tense=PRESENT, sp=key)
                 elif key == PRESENT:
-                    new = s
+                    new = lemma(s)
                 else:
                     new = conjugate(verb=s, tense=key)
                 if new:
