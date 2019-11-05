@@ -2,6 +2,7 @@ import numpy
 from pattern.en import conjugate, lemma, lexeme, PRESENT, PAST, PROGRESSIVE, SINGULAR, PLURAL, PARTICIPLE
 from itertools import chain, combinations, permutations
 import nltk
+import copy
 
 
 def powerset_reorder(iterable):
@@ -11,37 +12,35 @@ def powerset_reorder(iterable):
         for r in range(len(s)+1):
             for t in combinations(s, r):
                 result.append([n for n in t])
-    return result
+    return list(numpy.unique(numpy.array(result)))
 
 class Node:
     def __init__(self, value):
         self.value = value
-        self.children = []
+        self.word = []
         self.combination = []
         
     def __str__(self, l=[], t=True):
         if t:
             l=[]
-        assert self.children == [] or self.combination == []
-#         if self.children==[] and self.combination ==[]:
+        assert self.word == [] or self.combination == []
+#         if self.word==[] and self.combination ==[]:
 #             raise ValueError("Tree incomplete")
-        if self.children == []:
+        if self.word == []:
             buff = ""
-            expand = self.combination.copy()
+            expand = copy.deepcopy(self.combination)
             c = 0
             while c < len(expand):
                 i = 0
                 while i <len(expand[c]):
                     if type(expand[c][i]) == tuple:
                         ps = powerset_reorder(expand[c][i])
+                        base = expand[c]
+                        base.pop(i)
                         for elements in ps:
-                            tmp = expand[c].copy()
-                            tmp.pop(i)
-                            elements = elements
-                            elements.reverse()
-                            for e in elements:
-                                tmp.insert(i, e)
-                            expand.append(tmp)
+                            tmp = copy.deepcopy(base)
+                            tmp = tmp[:i] + elements + tmp[i:]
+                            expand.insert(c + 1, tmp)
                         expand.pop(c)
                         c = 0
                         i = 0
@@ -61,45 +60,47 @@ class Node:
                 
         elif self.combination == []:
             buff = ""
-            children = numpy.unique(numpy.array(self.children.copy()))
-            children.sort()
-            for c in children:
+            word = numpy.unique(numpy.array(self.word.copy()))
+            word.sort()
+            for c in word:
                 buff += "{} -> \"{}\"\n".format(self.value, c)
         target, indices = numpy.unique(numpy.array(buff.split("\n")), return_inverse=True)
         return "\n".join(target[indices])
     
-    def get_word(self, l=[]):
+    def get_word(self, l=[], t=True):
         words = []
+        if t:
+            l=[]
         if self.combination==[]:
-            return self.children
-        elif self.children==[]:
+            return self.word
+        elif self.word==[]:
             unique = numpy.unique(numpy.array(list(chain.from_iterable(self.combination))))
             unique.sort()
             l.append(self)
             for u in unique:
                 if u not in l:
-                    words.extend(u.get_word(l))
+                    words.extend(u.get_word(l, t=False))
         return words
             
-    def add_child(self, child):
+    def add_word(self, word):
         assert self.combination == []
-        if type(child) == str:
-            self.children.extend(child.split())
+        if type(word) == str:
+            self.word.extend(word.split())
         else:
-            self.children.extend(child)
-        self.iter = self.children
+            self.word.extend(word)
+        self.iter = self.word
     
     def add_tense(self):
         assert self.combination == []
-        self.add_child(convert(" ".join(self.children), PAST))
+        self.add_word(convert(" ".join(self.word), PAST))
         
     def add_comb(self, lst): 
-        assert self.children == []
+        assert self.word == []
         self.combination.append(lst)
 #         self.iter = self.combination
         
     def ext_comb(self, lst):
-        assert self.children == []
+        assert self.word == []
         assert type(lst[0]) == list
         self.combination.extend(lst)
 #         self.iter = self.combination
@@ -109,7 +110,7 @@ class Node:
             l = []
         if self.combination == []:
             return [self]
-        if self.children == []:
+        if self.word == []:
             leaf = []
             l.append(self)
             for node in chain.from_iterable(self.combination):
@@ -130,8 +131,8 @@ class Node:
     
     def __and__(self, node1):
         node0 = self
-        children0 = set(node0.children)
-        children1 = set(node1.children)
+        word0 = set(node0.word)
+        word1 = set(node1.word)
         combination0 = set(node0.combination)
         combination1 = set(node1.combination)
         value0 = node0.value
@@ -147,7 +148,7 @@ class Node:
         else:
             value = value0+"And"+value1
         node = Node(value)
-        node.children = list(children0&children1)
+        node.word = list(word0&word1)
         node.combination = list(combination0&combination1)
         return node
     
@@ -182,19 +183,19 @@ class Node:
 #                         SINGULAR:Node("PresentSingular"+value)
 #                     }
     
-#     def add_child(self, child):
+#     def add_word(self, word):
 #         assert self.combination == []
-#         assert type(child) == str
+#         assert type(word) == str
 #         for key in self.form.keys():
 #             buff = ""
-#             for s in child.split():
+#             for s in word.split():
 #                 if key==SINGULAR:
 #                     new = conjugate(verb=s, tense=PRESENT, sp=key)
 #                 else:
 #                     new = conjugate(verb=s, tense=key)
 #                 if new:
 #                     buff += new + " "
-#             self.form[key].add_child(buff)
+#             self.form[key].add_word(buff)
     
 #     def __getitem__(self, idx):
 #         return self.form[self.form.keys()[idx]]
@@ -216,9 +217,9 @@ class Node:
 class Word(Node):
     def __init__(self, value, parent=None):
         super().__init__(value)
-        self.children = [self.value]
+        self.word = [self.value]
         if parent:
-            parent.add_child(self.value)
+            parent.add_word(self.value)
 
 
 def generate_random_test(node_lst, num=1000, dir="random_test.txt"):

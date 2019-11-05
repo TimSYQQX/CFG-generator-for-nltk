@@ -1,0 +1,10 @@
+Sentence -> NounPhrase VerbPhrase 
+Sentence -> VerbPhrase 
+NounPhrase -> Adjective Noun 
+NounPhrase -> Noun 
+VerbPhrase -> Verb NounPhrase PrepositionalPhrase Adverb 
+VerbPhrase -> Verb NounPhrase PrepositionalPhrase 
+VerbPhrase -> Verb NounPhrase Adverb PrepositionalPhrase 
+VerbPhrase -> Verb NounPhrase Adverb 
+VerbPhrase -> Verb NounPhrase 
+PrepositionalPhrase -> Preposition NounPhrase 

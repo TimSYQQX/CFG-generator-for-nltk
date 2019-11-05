@@ -1,0 +1,7 @@
+Adjective -> "delicious"
+Noun -> "Bob"
+Noun -> "fish"
+Noun -> "sauce"
+Adverb -> "slowly"
+Preposition -> "with"
+Verb -> "eat"
