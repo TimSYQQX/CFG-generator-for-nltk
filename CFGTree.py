@@ -173,45 +173,47 @@ class Node:
         return parser
 
 ## Tense Transformation kind of work but not really, use it at your own risk
-# class Verb(Node):
-#     def __init__(self, value):
-#         super().__init__(value)
-#         self.form = {PRESENT:Node("Present" + value), 
-#                         PAST:Node("Present" + value),
-#                         PARTICIPLE:Node("Participle"+value),
-#                         PROGRESSIVE:Node("Progressive"+value), 
-#                         SINGULAR:Node("PresentSingular"+value)
-#                     }
+class Verb(Node):
+    def __init__(self, value):
+        super().__init__(value)
+        self.form = {PRESENT:Node("Present" + value), 
+                        PAST:Node("Present" + value),
+                        PARTICIPLE:Node("Participle"+value),
+                        PROGRESSIVE:Node("Progressive"+value), 
+                        SINGULAR:Node("PresentSingular"+value)
+                    }
     
-#     def add_word(self, word):
-#         assert self.combination == []
-#         assert type(word) == str
-#         for key in self.form.keys():
-#             buff = ""
-#             for s in word.split():
-#                 if key==SINGULAR:
-#                     new = conjugate(verb=s, tense=PRESENT, sp=key)
-#                 else:
-#                     new = conjugate(verb=s, tense=key)
-#                 if new:
-#                     buff += new + " "
-#             self.form[key].add_word(buff)
+    def add_word(self, word):
+        assert self.combination == []
+        assert type(word) == str
+        for key in self.form.keys():
+            buff = ""
+            for s in word.split():
+                if key==SINGULAR:
+                    new = conjugate(verb=s, tense=PRESENT, sp=key)
+                elif key == PRESENT:
+                    new = s
+                else:
+                    new = conjugate(verb=s, tense=key)
+                if new:
+                    buff += new + " "
+            self.form[key].add_word(buff)
     
-#     def __getitem__(self, idx):
-#         return self.form[self.form.keys()[idx]]
+    def __getitem__(self, idx):
+        return self.form[list(self.form.keys())[idx]]
     
-#     def __str__(self):
-#         buff = ""
-#         unique = self.form.values()
-#         for c in self.combination:
-#             tmp = ""
-#             for i in c:
-#                 tmp += i.value + " "
-#             buff += "{} -> {}\n".format(self.value, tmp)
-#         l.append(self)
-#         for u in unique:
-#             if not u in l:
-#                 buff += u.__str__([])
+    def __str__(self):
+        buff = ""
+        unique = self.form.values()
+        for c in self.combination:
+            tmp = ""
+            for i in c:
+                tmp += i.value + " "
+            buff += "{} -> {}\n".format(self.value, tmp)
+        l.append(self)
+        for u in unique:
+            if not u in l:
+                buff += u.__str__([])
          
         
 class Word(Node):
