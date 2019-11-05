@@ -172,7 +172,6 @@ class Node:
         parser = nltk.ChartParser(grammar)
         return parser
 
-## Tense Transformation kind of work but not really, use it at your own risk
 class Verb(Node):
     def __init__(self, value):
         super().__init__(value)
