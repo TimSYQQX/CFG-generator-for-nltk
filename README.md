@@ -13,4 +13,5 @@ This module generates Context Free Grammar used in nltk. Writting CFG have never
 -	Easy rule assignment
 -	Automatic tense transition for verb (experimental)
 
+For detailed usage see [usage](https://github.com/TimSYQQX/Context-Free-Grammar-Generator/blob/master/usage.ipynb).
 # Enjoy!
