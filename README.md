@@ -2,8 +2,10 @@
 This module generates Context Free Grammar used in nltk. Writting CFG have never been easier. 
 
 # Dependencies
-nltk \n
-numpy \n
+nltk
+
+numpy
+
 pattern (if you want to use automatic tense transformation)
 
 # Features
