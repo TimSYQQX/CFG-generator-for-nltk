@@ -1,6 +1,7 @@
 import numpy
 from pattern.en import conjugate, lemma, lexeme, PRESENT, PAST, PROGRESSIVE, SINGULAR, PLURAL, PARTICIPLE
 from itertools import chain, combinations, permutations
+import nltk
 
 
 def powerset_reorder(iterable):
@@ -164,6 +165,11 @@ class Node:
             f.write("\n".join(grammar))
         with open(lexicon_dir, "w") as f:
             f.write("\n".join(lexicon))
+    
+    def get_parser(self):
+        grammar = nltk.CFG.fromstring(str(self).split("\n"))
+        parser = nltk.ChartParser(grammar)
+        return parser
 
 ## Tense Transformation kind of work but not really, use it at your own risk
 # class Verb(Node):
